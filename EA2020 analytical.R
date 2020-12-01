@@ -61,9 +61,9 @@ chisq.test(healthstat$sex,healthstat$smoking,correct=F)
 chisq.test(healthstat$exercise,healthstat$smoking)$expected
 fisher.test(healthstat$exercise,healthstat$smoking)
 
---------------------------------------
+---------------------------------------
 #reporting your findings in table form
---------------------------------------
+---------------------------------------
 #package needed
 install.packages("sjPlot")
 install.packages("stargazer")
