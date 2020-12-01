@@ -28,11 +28,17 @@
 
 #loading the data
 
+#if spss (.sav)
 library(foreign)
-
-healthstat = read.spss("healthstatus.sav", to.data.frame = TRUE) #if csv, just change the extension
+healthstat = read.spss("healthstatus.sav", to.data.frame = TRUE) 
 str(healthstat)
 summary(healthstat)
+View(healthstat)
+
+#if excel (.xlsx)
+library(readxl)
+healthstat <- read_excel("healthstatus.xlsx")
+View(healthstat)
 
 #----------------------------
 #summarising numerical values
@@ -64,20 +70,20 @@ iqr_all
 cbind(Mean = mean_all, SD = sd_all, Median = median_all, IQR = iqr_all)
 rbind(Mean = mean_all, SD = sd_all, Median = median_all, IQR = iqr_all)
 
-#------------------
+#--------------------
 #normality assumption
-#-------------------
+#--------------------
 #mean~median
 #acceptable skewness & kurtosis +-2d
 #bell shaped curve
 #normality test
 
-# describe using codebook
+# describe using codebook, gives you mean~median
 library(epiDisplay)
 codebook(healthstat)
 codebook(healthstat[c("age", "sbp", "dbp")])
 
-# describe using describe
+# describe using describe, gives you skewness & kurtosis
 library(psych)
 describe(healthstat[c("age", "sbp", "dbp")])
 
@@ -154,17 +160,26 @@ ggplot(healthstat, aes(x = "sbp", y = sbp)) + geom_boxplot()
 #data row method
 
 is_outlier <- healthstat$age > 150 | healthstat$age < 0
+is_outlier
 
-#-------------------------
-#basic data transformation
-#-------------------------
+#--------------------------------------
+#basic data transformation:categorizing
+#--------------------------------------
 
 #glucose control (6.5% and above considered poor)
 healthstat$glucontrol<-cut(healthstat$hba1c, breaks=c(-Inf,6.49,Inf),labels=c("good", "poor"))
 summary(healthstat)
 
+#bmistatus (WHO classification)
+healthstat$bmi <- (healthstat$wt)/(healthstat$ht/100)**2
+healthstat$bmi
+healthstat$bmistat <- cut(healthstat$bmi, breaks=c(-Inf, 18.49999, 24.9999, 29.9999, Inf), labels=c("underweight", "normal", "overweight", "obese"))
+healthstat$bmistat
+
 #hypertension status (either sbp or dbp equal or more than 140/90mmHg, respectively, considered hypertensive)
 healthstat$hpt<-(healthstat$sbp>=140|healthstat$dbp>=90)
+summary(healthstat) #logical class for the new outcome
+healthstat$hpt2 <- as.factor(healthstat$hpt) #convert from logical to a factor variable
 summary(healthstat)
 
 #Acknowledgement : Dr WNAriffin (USM)
