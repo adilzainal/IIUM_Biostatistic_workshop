@@ -10,9 +10,11 @@ attach(data)
 plot(hba1c, sbp, main="HbA1c versus Systolic blood pressure", xlab="HBA1C ", ylab="Systolic blood pressure ", pch=19)
 abline(lm(sbp~hba1c), col="red") # regression line (y~x) 
 cor.test(hba1c, sbp, method=c("pearson")) #correlation for normally distributed data
+
 # Now we can can predict the systolic blood pressure when you know the HbA1c value using linear regression
 # The equation can be represented as, SBP = a + HBA1c * b
 # In this formula, a is the intercept and b is the slope, hence 1 unit increase in HBA1c,the SBP will increase by "b"
+
 # A linear regression can be calculated in R with the command lm which stands for linear model
 lmsbp <- lm(sbp~hba1c,data=data)
 # You will get the a and b, a is 116.534 and b is 1.052
@@ -43,6 +45,7 @@ lmsbp1 <- lm(sbp~hba1c + exercise,data=data)
 summary(lmsbp1)
 # We can also derived the 95% Confidence interval for the estimate using confint command
 confint(lmsbp1)
+
 # Linear regression makes few assumptions about the data 1.Linearity of the data. 2. Normality of residuals 3. Homogeneity of residuals variance 4. Independence of residuals error terms
 # 1. The first one is the linearity of the data between predictor x and outcome y
 # This can be checked by inspecting Residuals vs Fitted 
