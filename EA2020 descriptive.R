@@ -1,6 +1,6 @@
 # ======================
-# Descriptive statistics
-#
+# Descriptive Statistics
+# R Biostat Workshop IIUM
 # Edre MA, DrPH
 # ======================
 
@@ -113,4 +113,4 @@ prop_sex_smoking
 per_sex_smoking = prop_sex_smoking*100
 per_sex_smoking
 
-
+#Acknowledgement : Dr WNAriffin (USM)
