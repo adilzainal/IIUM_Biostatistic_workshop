@@ -8,19 +8,21 @@
 #Comparing numerical values: parametric
 ----------------------------------------
 
-#independent sample t test
-t.test(sbp ~ sex, var.equal=TRUE, data=healthstat)
-library(ggpubr)
-p <- ggboxplot(healthstat, x = "sex", y = "sbp",color = "sex", palette = "jco", add = "jitter")
-p + stat_compare_means(method = "t.test")
+library(readxl)
+healthstat <- read_excel("healthstatus.xlsx")
+View(healthstat)
 
+#independent sample t test
+t.test(sbp ~ sex, data = healthstat)
+library(ggpubr)
+ggboxplot(healthstat, x = "sex", y = "sbp",color = "sex", palette = "jco", add = "jitter") + stat_compare_means(method = "t.test")
+ 
 #one way ANOVA
 
 one.way =aov(sbp ~ exercise, data = healthstat)
 summary(one.way)
 
-j <- ggboxplot(healthstat, x = "exercise", y = "sbp",color = "exercise", palette = "jco", add = "jitter")
-j + stat_compare_means(method = "anova")
+ggboxplot(healthstat, x = "exercise", y = "sbp",color = "exercise", palette = "jco", add = "jitter") + stat_compare_means(method = "anova")
 
 tukey.one.way<-TukeyHSD(one.way) #assuming equal variance
 tukey.one.way
@@ -65,15 +67,15 @@ chisq.test(healthstat$sex,healthstat$smoking,correct=F)
 
 #fisher's exact test (used when more than 20% celss with expected count less than 5)
 
-chisq.test(healthstat$bmistat,healthstat$smoking)$expected
-fisher.test(healthstat$bmistat,healthstat$smoking)
+chisq.test(healthstat$exercise,healthstat$smoking)$expected
+fisher.test(healthstat$exercise,healthstat$smoking)
 
 ---------------------------------------
 #reporting your findings in table form
 ---------------------------------------
 #package needed
-install.packages("sjPlot")
-install.packages("apaTables")
+#"sjPlot"
+#"apaTables"
 library(sjPlot)
 library(apaTables)
 
