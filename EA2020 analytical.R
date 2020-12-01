@@ -56,7 +56,7 @@ cor.test(healthstat$hba1c,healthstat$sbp, method="spearman")
 
 chisq.test(healthstat$sex,healthstat$smoking,correct=F)
 
-#fisher's exact test
+#fisher's exact test (used when more than 20% celss with expected count less than 5)
 
 chisq.test(healthstat$exercise,healthstat$smoking)$expected
 fisher.test(healthstat$exercise,healthstat$smoking)
