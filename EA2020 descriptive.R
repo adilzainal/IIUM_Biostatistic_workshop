@@ -1,8 +1,8 @@
-# ======================
+# =======================
 # Descriptive Statistics
 # R Biostat Workshop IIUM
 # Edre MA, DrPH
-# ======================
+# =======================
 
 #----------------------------------
 #libraries needed to be installed
@@ -129,5 +129,42 @@ by(healthstat$age, healthstat$sex, IQR)
 
 by(healthstat$age, healthstat$smoking, median)
 by(healthstat$age, healthstat$smoking, IQR)
+
+#-------------
+#missing data
+#-------------
+
+#usually coded as "NA" in the dataset
+
+is.na(healthstat)
+which (is.na(healthstat$sbp))
+
+#demonstrating the row to show the missing value using dummy data
+x<- c(1,13,14,NA,2,44)
+which (is.na(x))
+
+
+#-----------------
+#outlier detection
+#-----------------
+
+#visual method
+ggplot(healthstat, aes(x = "sbp", y = sbp)) + geom_boxplot()
+
+#data row method
+
+is_outlier <- healthstat$age > 150 | healthstat$age < 0
+
+#-------------------------
+#basic data transformation
+#-------------------------
+
+#glucose control (6.5% and above considered poor)
+healthstat$glucontrol<-cut(healthstat$hba1c, breaks=c(-Inf,6.49,Inf),labels=c("good", "poor"))
+summary(healthstat)
+
+#hypertension status (either sbp or dbp equal or more than 140/90mmHg, respectively, considered hypertensive)
+healthstat$hpt<-(healthstat$sbp>=140|healthstat$dbp>=90)
+summary(healthstat)
 
 #Acknowledgement : Dr WNAriffin (USM)
