@@ -4,21 +4,39 @@
 # Edre MA, DrPH
 # ======================
 
-#--------------------------------
-#~libraries needed to be installed~ 
+#----------------------------------
+#libraries needed to be installed
+#----------------------------------
 #foreign
 #epiDisplay
 #psych
 #ggubr
 #usingR
-#--------------------------------
 
+
+#--------------
 # data
+#--------------
+
+#pulling the data from GitHub
+
+#go to https://github.com/adilzainal/IIUM_Biostatistic_workshop
+#click "code" -> "Download ZIP" 
+#extract the ZIP file using WinRAR
+#Create a new specific folder to store all files in your desktop
+#set as working directory
+
+#loading the data
+
 library(foreign)
 
 healthstat = read.spss("healthstatus.sav", to.data.frame = TRUE) #if csv, just change the extension
 str(healthstat)
 summary(healthstat)
+
+#----------------------------
+#summarising numerical values
+#----------------------------
 
 # central tendency & dispersion
 mean(healthstat$sbp)
@@ -33,20 +51,6 @@ median(healthstat$age)
 IQR(healthstat$sbp)
 IQR(healthstat$age)
 
-# proportion
-tab_sex = table(healthstat$sex)
-tab_smoking = table(healthstat$smoking)
-tab_sex
-tab_smoking
-str(tab_sex)
-str(tab_smoking)
-
-prop.table(tab_sex)
-prop.table(tab_smoking)
-
-prop.table(tab_sex)*100
-prop.table(tab_smoking)*100
-
 # describe using sapply
 mean_all = sapply(healthstat[c("age", "sbp", "dbp")], mean)
 mean_all
@@ -60,12 +64,13 @@ iqr_all
 cbind(Mean = mean_all, SD = sd_all, Median = median_all, IQR = iqr_all)
 rbind(Mean = mean_all, SD = sd_all, Median = median_all, IQR = iqr_all)
 
-tab_ss = sapply(healthstat[c("sex", "smoking")], table)
-tab_ss
-prop_ss = prop.table(tab_ss, margin=2)
-prop_ss
-per_ss = (prop_ss)*100
-per_ss
+#------------------
+#normality assumption
+#-------------------
+#mean~median
+#acceptable skewness & kurtosis +-2d
+#bell shaped curve
+#normality test
 
 # describe using codebook
 library(epiDisplay)
@@ -89,6 +94,28 @@ lines(x, y, col = "red")
 # Determining normality of numerical data: normality test
 shapiro.test(healthstat$age) #if data sample size is <50
 
+#------------------------------
+#summarising categorical values
+#------------------------------
+
+# proportion
+tab_sex = table(healthstat$sex)
+tab_smoking = table(healthstat$smoking)
+tab_sex
+tab_smoking
+str(tab_sex)
+str(tab_smoking)
+
+prop.table(tab_sex)
+prop.table(tab_smoking)
+
+prop.table(tab_sex)*100
+prop.table(tab_smoking)*100
+
+#crosstabulation
+smokingbygender<-table(healthstat$sex, healthstat$smoking)
+prop.table(smokingbygender, margin=1)
+prop.table(smokingbygender, margin=1)*100
 
 # by groups (Stratified by a categorical variable)
 by(healthstat$age, healthstat$sex, mean)
@@ -102,15 +129,5 @@ by(healthstat$age, healthstat$sex, IQR)
 
 by(healthstat$age, healthstat$smoking, median)
 by(healthstat$age, healthstat$smoking, IQR)
-
-# cross-tabulation
-tab_sex_smoking = table(Gender = healthstat$sex, Smoking = healthstat$smoking)
-tab_sex_smoking
-
-prop_sex_smoking = prop.table(tab_sex_smoking, margin=1)
-prop_sex_smoking
-
-per_sex_smoking = prop_sex_smoking*100
-per_sex_smoking
 
 #Acknowledgement : Dr WNAriffin (USM)
