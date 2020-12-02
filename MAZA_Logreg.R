@@ -22,7 +22,6 @@ summary(logmodel)
 # The coefficient in logistic regression is in the log odds of the Hpt for a unit increase in predictor exercise
 # Having moderate exercise compareto low exercise, change the log odds of hypertension by -1.8801
 # We can test the overall effect of exercise using the wald.test in the aod library
-library(aod)
 wald.test(b = coef(logmodel), Sigma = vcov(logmodel), Terms = 2:3)
 # The p value for the ovrall variable exercise is significant a p<0.05
 

@@ -1,5 +1,6 @@
 ## MANOVA 
-
+install.packages("GGally")
+library(GGally)
 # In the situation where we have multiple response variables, we can test them simultaneously using MANOVA
 # We want to know whether exercise affect both the sbp and dbp. MANOVA can test this hypothesis
 # Instead of conducting 2 anova seperately, we can conduct manova to see the effect of a factor on the linear combination of the outcome

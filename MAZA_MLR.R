@@ -1,3 +1,4 @@
+setwd("~/Desktop/Medical Statistic/IIUM Biostatistic Workshop/IIUM_Biostatistic_workshop")
 data <- read.spss(file="healthstatus.sav", to.data.frame=TRUE)
 attach(data)
 str(data)
