@@ -1,5 +1,6 @@
 ## Simple and multiple logistic regression
-
+install.packages("aod")
+library(aod)
 # Make hypertension or composite variable
 sbpc <- cut(sbp , breaks = c(-Inf,129.9,Inf), labels = c("1","2"))
 sbpc <-as.numeric(sbpc)
