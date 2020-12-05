@@ -13,7 +13,9 @@ interaction.plot(x.factor = data$exercise, trace.factor = data$sex,
                  response = data$sbp, fun = mean, 
                  type = "b", legend = TRUE, 
                  xlab = "Exercise", ylab="SBP",
-                 pch=c(1,19), col = c("#00AFBB", "#E7B800"))
+                 pch=c(1,19), col = c("#00AFBB", "#E7B800")) 
+# reorder high and moderate 
+# Descriptive result 
 
 # We can then run the 2 way anova by using aov command and see the summary of the variance model using summary command
 wanova <- aov(sbp ~ exercise + sex, data = data)
@@ -23,7 +25,7 @@ summary(wanova)
 
 # We can also check the interaction effect by adding interaction term
 wanova2 <- aov(sbp ~ exercise + sex + exercise:sex, data=data)
-summary(wanova2)
+summary(wanova2, type=3)
 # It can be seen that the interaction is not significant, thus the relationship of exercise and sbp does not depend on sex
 library(dplyr)
 group_by(data, exercise, sex) %>%
@@ -40,11 +42,12 @@ TukeyHSD(wanova2, which = "exercise")
 plot(wanova2, 1)
 leveneTest(sbp ~ exercise*sex, data = data)
 # The levene test is significant, thus the variance across group is significantly different
-# 2. Normality assumpton by plotting the residuals, as all the points fall approximately along this reference line, we can assume normality.
+# 2. Normality assumption by plotting the residuals, as all the points fall approximately along this reference line, we can assume normality.
 plot(wanova2, 2)
 aov_residuals <- residuals(object = wanova2)
 shapiro.test(x=aov_residuals)
 # We can support this by doing the Shapiro Wilk test on the ANOVA Residuals
-# 2 Way ANOVA Test for unbalanced designs, basically the above test is for balanced design, if we have unbalanced design we should use the following test.
-wanova3 <- aov(sbp ~ exercise*sex, data = data)
-Anova(wanova3, type ="III")
+# Since there is no interaction, so the final model should use type 2 anova.
+# If the interaction is significant, we should specify the type 3 anova, such as below.
+wanova3 <- aov(sbp ~ exercise + sex + exercise*sex, data = data)
+Anova(wanova3, type=3)

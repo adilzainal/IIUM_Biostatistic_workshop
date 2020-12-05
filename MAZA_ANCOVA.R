@@ -27,6 +27,7 @@ data %>% anova_test(sbp ~ exercise*hba1c)
 # 3. The outcome variable should be normally distributed by checking using Shapiro Wilk test of normality on the test residuals
 # Fit the model, the covariate goes first
 model <- lm(sbp ~ hba1c + exercise, data = data)
+summary(model)
 # Inspect the model diagnostic metrics
 model.metrics <- augment(model) %>%
   select(-.hat, -.sigma, -.fitted, -.se.fit) # Remove details
@@ -40,8 +41,9 @@ model.metrics %>%
   filter(abs(.std.resid) > 3) %>%
   as.data.frame()
 
-# Run ANCOVA
-res.aov <- data %>% anova_test(sbp ~ hba1c + exercise)
+# Run ANCOVA main effect
+res.aov <- data %>%
+  anova_test(sbp ~ hba1c + exercise)
 get_anova_table(res.aov)
 # Run post hoc test pairwise comparisons
 library(emmeans)
@@ -55,6 +57,7 @@ pwc
 get_emmeans(pwc)
 
 #An ANCOVA was run to determine the effect of exercises on the sbp  after controlling for HBA1C of participants.
+# Even after control for HbA1C, the benefit of exercise is still similar where at least moderate exercise intensity. 
 #After adjustment for HBA1c, there was a statistically significant difference in sbp between the groups, F(2, 41) = 218.63, p < 0.0001.
 #Post hoc analysis was performed with a Bonferroni adjustment. The mean sbp  was statistically significantly greater in grp1 (16.4 +/- 0.15) compared to the grp2 (15.8 +/- 0.12) and grp3 (13.5 +/_ 0.11), p < 0.001
 
