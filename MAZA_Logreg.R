@@ -2,19 +2,26 @@
 install.packages("aod")
 install.packages("dplyr")
 install.packages("ggplot")
+install.packages("finalfit")
+install.packages("rstan")
+install.packages("boot")
 library(aod)
 library(dplyr)
 library(ggplot)
 library(tidyverse)
 library(broom)
 library(car)
+library(finalfit)
+library(rstan)
+library(boot)
+library(knitr)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
 # Data preparation
 # Make hypertension or composite variable
-hpt<-(sbp>=140|dbp>=90)
-hpt <- as.factor(hpt)
+data$hpt<-(sbp>=140|dbp>=90)
+data$hpt <- as.factor(hpt)
 summary(hpt)
 
 #-----------------------------------------------------------------------------------------------------------------------------
@@ -121,14 +128,18 @@ model.data %>%
 
 # 3. Multicollinearity
 mlogmodel2 <- glm(hpt ~ exercise + hba1c + age, data=data, family=binomial)
+summary(mlogmodel2)
 car::vif(mlogmodel2)
 # As a rule of thumb, a VIF value that exceeds 5 or 10 indicates a problematic amount of collinearity. 
 # In our example, there is no collinearity: all variables have a value of VIF well below 5.
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
-# Table final result using apatables
-apa.reg.table(mlogmodel2, filename = "Table3_APA.doc", table.number = 3)
+# Table final result using finalfit
+explanatory = c("age", "exercise", "hba1c")
+dependent = 'hpt'
+data %>%
+  summary_factorlist(dependent, explanatory, p=TRUE, add_dependent_label=TRUE)
 
 
 

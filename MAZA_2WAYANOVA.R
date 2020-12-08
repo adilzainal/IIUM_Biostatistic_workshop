@@ -1,12 +1,12 @@
 ## 2 Way ANOVA
 
-# We have seen that there is signficant differnet in systolic blood pressure between the exercise group.
+# We have seen that there is signficant different in systolic blood pressure between the exercise group.
 # We can also evaluate simultaneously the effect of 2 group variable (2way) on a response variable (sbp)
 # Let say we want to know the effect of sex and exercise on systolic blood pressure
 
+#-------------------------------------------------------------------------------------------------------------------
+
 # We visualise first our group differences using ggpubr package
-install.packages("ggpubr")
-library(ggpubr)
 ggboxplot(data, x = "exercise", y = "sbp", color = "sex",palette = c("#00AFBB", "#E7B800"))
 contrasts(exercise)
 interaction.plot(x.factor = data$exercise, trace.factor = data$sex, 
@@ -16,6 +16,8 @@ interaction.plot(x.factor = data$exercise, trace.factor = data$sex,
                  pch=c(1,19), col = c("#00AFBB", "#E7B800")) 
 # reorder high and moderate 
 # Descriptive result 
+
+#-------------------------------------------------------------------------------------------------------------------
 
 # We can then run the 2 way anova by using aov command and see the summary of the variance model using summary command
 wanova <- aov(sbp ~ exercise + sex, data = data)
@@ -37,6 +39,8 @@ group_by(data, exercise, sex) %>%
 # Since the main effect of exercise is significant we need to do post hoc test to see which pair is significant
 TukeyHSD(wanova2, which = "exercise")
 
+#-------------------------------------------------------------------------------------------------------------------
+
 # We need to check the assumptions for the anova
 # 1. Homogeneity of variance
 plot(wanova2, 1)
@@ -51,3 +55,7 @@ shapiro.test(x=aov_residuals)
 # If the interaction is significant, we should specify the type 3 anova, such as below.
 wanova3 <- aov(sbp ~ exercise + sex + exercise*sex, data = data)
 Anova(wanova3, type=3)
+
+#-------------------------------------------------------------------------------------------------------------------
+
+# Report writing using APA Table

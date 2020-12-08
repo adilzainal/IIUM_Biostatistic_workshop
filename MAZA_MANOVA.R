@@ -1,11 +1,17 @@
-## MANOVA 
+# Package required
 install.packages("GGally")
 library(GGally)
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+## MANOVA
 # In the situation where we have multiple response variables, we can test them simultaneously using MANOVA
 # We want to know whether exercise affect both the sbp and dbp. MANOVA can test this hypothesis
 # Instead of conducting 2 anova seperately, we can conduct manova to see the effect of a factor (exercise) on the linear combination of the outcome
-# We visualize our data first
 
+#-----------------------------------------------------------------------------------------------------------------------------
+
+# We visualize our data first
 ggboxplot(data, x = "exercise", y = c("sbp", "dbp"), 
           merge = TRUE, palette = "jco")
 
@@ -13,6 +19,27 @@ ggboxplot(data, x = "exercise", y = c("sbp", "dbp"),
 data %>%
   group_by(exercise) %>%
   get_summary_stats(sbp, dbp, type = "mean_sd")
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+# Compute manova , we use pillai trace as the multivariate statistic as it is recommended. There are 3 other test.
+model <- lm(cbind(sbp, dbp) ~ exercise, data)
+Manova(model, test.statistic = "Pillai")
+summary.aov(model)
+# There was statistically significant difference between the exercise on the linear combination of sbp and dbp
+# Seperate anova also show significant different between exercise on sbp and dbp respectively
+
+# We then now run multiple pairwise comparisons
+pwc <- data %>%
+  gather(key = "variables", value = "value", sbp, dbp) %>%
+  group_by(variables) %>%
+  games_howell_test(value ~ exercise) %>%
+  select(-estimate, -conf.low, -conf.high) # Remove details
+pwc
+
+# We can conclude that moderate exercise is enough to see the significant difference on the linear combination of sbp and dbp
+
+#-----------------------------------------------------------------------------------------------------------------------------
 
 # Assumptions for MANOVA are
 # 1. Adequate sample size , the rule of thumb is the n in each cell > the number of outcome variables
@@ -54,19 +81,9 @@ data %>%
 box_m(data[, c("sbp", "dbp")], data$exercise)
 # Although we have many assumptions, the most important assumptions are .....
 
-# Compute manova , we use pillai trace as the multivariate statistic as it is recommended. There are 3 other test.
-model <- lm(cbind(sbp, dbp) ~ exercise, data)
-Manova(model, test.statistic = "Pillai")
-summary.aov(model)
-# There was statistically significant difference between the exercise on the linear combination of sbp and dbp
-# Seperate anova also show significant different between exercise on sbp and dbp respectively
+#-----------------------------------------------------------------------------------------------------------------------------
 
-# We then now run multiple pairwise comparisons
-pwc <- data %>%
-  gather(key = "variables", value = "value", sbp, dbp) %>%
-  group_by(variables) %>%
-  games_howell_test(value ~ exercise) %>%
-  select(-estimate, -conf.low, -conf.high) # Remove details
-pwc
+# Reporting of MANOVA result using APATable
 
-# We can conclude that moderate exercise is enough to see the significant difference on the linear combination of sbp and dbp
+
+

@@ -1,16 +1,9 @@
 ## Repeated measure ANOVA
-
-library(tidyverse)
-library(ggpubr)
-library(rstatix)
-
 # The repeated measure ANOVA is used to analyze when we measure more than once.
 # One way repeated measure ANOVA is essentially an extension of paired sample t-test to compare means of 3 or more level of within subject variable
 # A 2 way ANOVA is to evaluate simultaneously effect of 2 within subject factors on a continous outcome
 
-# Let us first create a random variable for SBP at time 2 and time 3  *omit export finalize dataset 
-data$sbp1 <- rnorm(153, mean=121, sd=10)
-data$sbp2 <- rnorm(153, mean=118, sd=12.1)
+#-----------------------------------------------------------------------------------------------------------------------------
 
 # We change the data to long format first
 # Gather columns t1, t2 and t3 into long format
@@ -19,6 +12,9 @@ data1 <- data %>%
   gather(key = "time", value = "sbpmeasure", sbp, sbp1, sbp2) %>%
   convert_as_factor(id, time)
 data1 <- data
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
 # Get the summary statistics
 data1 %>%
   group_by(time) %>%
@@ -28,6 +24,7 @@ data1 %>%
 bxp <- ggboxplot(data1, x = "time", y = "sbpmeasure", add = "point")
 bxp
 
+#-----------------------------------------------------------------------------------------------------------------------------
 
 # The assumption for RM-ANOVA are
 # 1. No significant outliers using identify_outliers
@@ -49,8 +46,11 @@ get_anova_table(res.aov)
 pwc <- data1 %>%
   pairwise_t_test(sbpmeasure ~ time, paired = TRUE,p.adjust.method = "bonferroni")
 pwc
+# Interpretation
 
-# Interpretation .... 
+#-----------------------------------------------------------------------------------------------------------------------------
+
+# Result of RM-ANOVA  .... 
 # include exercise variables 
 
 
