@@ -2,27 +2,27 @@
 install.packages("aod")
 install.packages("dplyr")
 install.packages("ggplot")
-install.packages("finalfit")
 install.packages("rstan")
 install.packages("boot")
+install.packages("stargazer")
 library(aod)
 library(dplyr)
 library(ggplot)
 library(tidyverse)
 library(broom)
 library(car)
-library(finalfit)
 library(rstan)
 library(boot)
 library(knitr)
+library(stargazer)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
 # Data preparation
 # Make hypertension or composite variable
 data$hpt<-(sbp>=140|dbp>=90)
-data$hpt <- as.factor(hpt)
-summary(hpt)
+data$hpt <- as.factor(data$hpt)
+summary(data$hpt)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -135,11 +135,11 @@ car::vif(mlogmodel2)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
-# Table final result using finalfit
-explanatory = c("age", "exercise", "hba1c")
-dependent = 'hpt'
-data %>%
-  summary_factorlist(dependent, explanatory, p=TRUE, add_dependent_label=TRUE)
+# Table final result using stargazer
+stargazer(mlogmodel, type="text", out="models.txt")
+exp(coef(mlogmodel))
+stargazer(exp(coef(mlogmodel)), type="text", out="models.txt")
+
 
 
 

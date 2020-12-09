@@ -12,6 +12,7 @@ library(GGally)
 #-----------------------------------------------------------------------------------------------------------------------------
 
 # We visualize our data first
+data$exercise <- factor(data$exercise,levels = c("Low", "Moderate", "High"))
 ggboxplot(data, x = "exercise", y = c("sbp", "dbp"), 
           merge = TRUE, palette = "jco")
 
@@ -29,15 +30,18 @@ summary.aov(model)
 # There was statistically significant difference between the exercise on the linear combination of sbp and dbp
 # Seperate anova also show significant different between exercise on sbp and dbp respectively
 
-# We then now run multiple pairwise comparisons
+# We then now run multiple pairwise comparisons for each outcome
+grouped.data <- data %>%
+  gather(key = "variables", value = "value", sbp, dbp) %>%
+  group_by(variables)
+
 pwc <- data %>%
   gather(key = "variables", value = "value", sbp, dbp) %>%
   group_by(variables) %>%
-  games_howell_test(value ~ exercise) %>%
-  select(-estimate, -conf.low, -conf.high) # Remove details
+  games_howell_test(value ~ exercise) 
 pwc
 
-# We can conclude that moderate exercise is enough to see the significant difference on the linear combination of sbp and dbp
+# We can conclude that there is significant different between low and high for dbp and between low and moderate with high for sbp
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +50,9 @@ pwc
 data %>%
   group_by(exercise) %>% 
   summarise(N=n())
+
 # 2. independence of variables, the selection of the sample should be completely random
+
 # 3. Absence of univariate or multivariate outliers
 data %>%  # univariate outliers
   group_by(exercise) %>%
@@ -59,26 +65,38 @@ data %>% # multivariate outliers using mahalanobis distance
   mahalanobis_distance(-id) %>%
   filter(is.outlier == TRUE) %>%
   as.data.frame()
+
 # 4. Multivariate normality using mshapiro_Test() from rstatix package
 data %>% group_by(exercise) %>% shapiro_test(sbp, dbp) %>% arrange(variable) # univariate
 data %>% select(sbp, dbp) %>% mshapiro_test() # multivariate
+
 # 5. Absence of multicollinearity between the dependent outcomes. The correlation should not be above 0.9
 data %>% cor_test(sbp, dbp)
+
 # 6. Linearity between all outcome variables for each group
-library(GGally)
 results <- data %>%
   select(sbp, dbp, exercise) %>%
   group_by(exercise) %>%
   doo(~ggpairs(.) + theme_bw(), result = "plots")
 results
 results$plots
+
 # 7. Homogeneity of variances using Levene's test
 data %>% 
   gather(key = "variable", value = "value", sbp, dbp) %>%
   group_by(variable) %>%
   levene_test(value ~ exercise)
+
 # 8. Homogeneity of variance-covariance matrices using Box's M Test, 
 box_m(data[, c("sbp", "dbp")], data$exercise)
+# p value is significant so it has violate the assumption
+# Note that, if you have balanced design (i.e., groups with similar sizes),
+# you don’t need to worry too much about violation of the homogeneity of variances-covariance matrices 
+# and you can continue your analysis.
+# However, having an unbalanced design is problematic. 
+# Possible solutions include: 1) transforming the dependent variables; 
+# 2) running the test anyway, but using Pillai’s multivariate statistic instead of Wilks’ statistic.
+
 # Although we have many assumptions, the most important assumptions are .....
 
 #-----------------------------------------------------------------------------------------------------------------------------

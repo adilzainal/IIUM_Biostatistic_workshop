@@ -7,6 +7,7 @@ library(foreign)
 library(rstatix)
 library(MASS)
 library(apaTables)
+library(finalfit)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
@@ -148,7 +149,12 @@ plot(lmsbp, 5)
 #-----------------------------------------------------------------------------------------------------------------------------
 
 #How to summarize findings using apaTable
-apa.reg.table(lmsbp4, filename = "Table1_APA.doc", table.number = 1) 
-apa.reg.table(lmsbp3, lmsbp4, filename = "Table2_APA.doc", table.number = 2)
+apa.reg.table(lmsbp4, filename = "Table1_APA_MLR.doc", table.number = 1) 
+apa.reg.table(lmsbp3, lmsbp4, filename = "Table2_APA_MLR.doc", table.number = 2)
 
+#How to summarize findings using apaTable
+explanatory = c("hba1c", "exercise","sex","smoking")
+explanatory_multi = c("hba1c", "exercise","sex","smoking")
+dependent = 'sbp'
+data %>% finalfit(dependent, explanatory, explanatory_multi)
 
