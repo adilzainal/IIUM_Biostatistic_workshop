@@ -24,6 +24,8 @@ library(car)
 leveneTest(sbp ~ sex, data = healthstat, center=mean)
 t.test(sbp ~ sex, data = healthstat)
 
+#we want to visualize the comparison
+
 library(ggpubr)
 ggboxplot(healthstat, x = "sex", y = "sbp",
           color = "sex", 
@@ -31,7 +33,8 @@ ggboxplot(healthstat, x = "sex", y = "sbp",
           add = "mean") + 
           stat_compare_means(method = "t.test")
       
- 
+#now we know sex has no effect on sbp in our study
+#we want to know now, does exercise have an effect (low,mod,high intensity)
 #one way ANOVA
 
 library(psych)
@@ -43,26 +46,50 @@ ggboxplot(healthstat, x = "exercise", y = "sbp",
           color = "exercise", 
           palette = "jco", 
           add = "jitter") + 
-  stat_compare_means(method = "anova")
+          stat_compare_means(method = "anova")
 
+#yes, there is significant effect of exercise on sbp
+#but, which pair comparison has most effect?
 
 leveneTest(sbp ~ exercise, data = healthstat, center=mean)
-tukey.one.way<-TukeyHSD(one.way) #assuming equal variance
+
+#significant p value, thus equal variance not assumed
+#Post Hoc test - Games Howell
+
+install.packages("userfriendlyscience")
+library(userfriendlyscience)
+oneway(healthstat$exercise, y = healthstat$sbp, posthoc = 'games-howell')
+
+#if equal variance assumed, use Tukey
+tukey.one.way<-TukeyHSD(one.way) 
 tukey.one.way
 
-#paired t test
-
-t.test(healthstat$wt, healthstat$wt2, paired=TRUE)
+#Exercise adds benefit in sbp reduction
+#does it correlate with weight?
 
 #pearson correlation coefficient test
 
-cor.test(healthstat$hba1c,healthstat$sbp, method="pearson")
-ggscatter(healthstat, x = "hba1c", y = "sbp", 
+cor.test(healthstat$wt,healthstat$sbp, method="pearson")
+ggscatter(healthstat, x = "wt", y = "sbp", 
           add = "reg.line", 
           conf.int = TRUE, 
           cor.coef = TRUE, 
           cor.method = "pearson", 
-          xlab = "Age (years)", ylab = "SBP (mmHg)")
+          xlab = "Weight (kg)", ylab = "SBP (mmHg)")
+
+#yes, the heavier the person, the higher the sbp
+#now you conducted a high-intensity interval training (HIIT) intervention
+#you want to measure pre and post HIIT effect on weight
+#paired t test
+
+t.test(healthstat$wt, healthstat$wt2, paired=TRUE)
+ggscatter(healthstat, x = "wt", y = "wt2", 
+          add = "reg.line", 
+          conf.int = TRUE, 
+          cor.coef = TRUE, 
+          cor.method = "pearson", 
+          xlab = "pre-HIIT weight (kg)", ylab = "post-HIIT weight (kg)") +
+          grids(linetype = "solid")
 
 #------------------------------------------
 #comparing numerical values: non-parametric
