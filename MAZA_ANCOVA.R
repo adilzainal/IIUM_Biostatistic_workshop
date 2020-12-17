@@ -8,7 +8,8 @@ library(emmeans)
 # ANCOVA is used to compare means of the outcome between a group (which have 2 or more category) taking into account of other continous variable (covariate)
 # One-way ANCOVA is just an extension of one-way ANOVA but adding a covariate
 # Let say we want to know whether is there significant different of systolic blood pressure between exercise level taking into account HbA1c level
-# The different between ANCOVA and multiple linear regression is that 
+# The different between ANCOVA and regression is that regression is more advanced analysis when you want to do prediction
+# Whereas ancova is when the focus is to compare the on of the independent variable groups
 
 #-----------------------------------------------------------------------------------------------------------------------------
 

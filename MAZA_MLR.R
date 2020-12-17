@@ -33,6 +33,7 @@ cor.test(hba1c, dbp, method=c("pearson")) #correlation for normally distributed 
 # Now we can also measure the linear relationship between each blood pressure and HbA1c using simple linear regression
 # This relationship between 2 variable is stil bivariate analysis
 # This relationship can be represented by the equation SBP = HBA1c * b1 + a
+# Our objective here is how hba1c value can affect the sbp value.
 # In this formula, a is the intercept and b is the slope, hence 1 unit increase in HBA1c,the SBP will increase by "b" coefficient unit
 # And similarly for Diastolic blood pressure 
 # A linear regression can be calculated in R with the command lm which stands for linear model

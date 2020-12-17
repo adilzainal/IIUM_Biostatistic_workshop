@@ -8,6 +8,8 @@ library(car)
 # We have seen that there is signficant different in systolic blood pressure between the exercise group.
 # We can also evaluate simultaneously the effect of 2 group variable (2way) on a response variable (sbp)
 # Let say we want to know the effect of exercise on systolic blood pressure after control for sex
+# The hypothesis for anova is to know whether is there any significant different of sbp value between exercise level.
+# For 2 way anova, we want to know the effect of exercise and sex on sbp value
 
 #-------------------------------------------------------------------------------------------------------------------
 
