@@ -20,6 +20,7 @@ library(stargazer)
 
 # Data preparation
 # Make hypertension or composite variable
+attach(data)
 data$hpt<-(sbp>=140|dbp>=90)
 data$hpt <- as.factor(data$hpt)
 summary(data$hpt)
@@ -32,7 +33,7 @@ summary(data$hpt)
 # It is useful when we want to calculate the probability.
 # In r we will use glm function which is generally used to fit generalized linear models to fit the logistic regression model.
 # We need to make it clear that you want to fit a logistic regression model. We resolve this by setting the family argument to binomial. This way, you tell glm() to put fit a logistic regression model instead of one of the many other models that can be fit to the glm.
-contrasts(hpt)
+contrasts(data$hpt)
 contrasts(exercise)
 # So we know the reference category is normotensive, so we want to predict or the odds of having hypertension
 # So now we can run the simple logistic regression

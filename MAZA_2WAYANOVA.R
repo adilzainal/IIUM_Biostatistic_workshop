@@ -25,7 +25,7 @@ interaction.plot(x.factor = data$exercise, trace.factor = data$sex,
 describeBy(data$sbp,list(data$exercise,data$sex),mat=TRUE) # Method 1
 
 group_by(data, exercise, sex) %>% # Method 2
-  summarise(
+  summary(
     count = n(),
     mean = mean(sbp, na.rm = TRUE),
     sd = sd(sbp, na.rm = TRUE))
