@@ -150,8 +150,7 @@ plot(lmsbp, 5)
 #-----------------------------------------------------------------------------------------------------------------------------
 
 #How to summarize findings using apaTable
-apa.reg.table(lmsbp4, filename = "Table1_APA_MLR.doc", table.number = 1) 
-apa.reg.table(lmsbp3, lmsbp4, filename = "Table2_APA_MLR.doc", table.number = 2)
+apa.reg.table(lmsbp3, filename = "Table1_APA_MLR.doc", table.number = 1) 
 
 #How to summarize findings using apaTable
 explanatory = c("hba1c", "exercise","sex","smoking")

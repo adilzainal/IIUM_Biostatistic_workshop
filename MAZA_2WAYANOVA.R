@@ -1,6 +1,7 @@
 ## Package requireMethods
 library(psych)
 library(car)
+library(dplyr)
 #-------------------------------------------------------------------------------------------------------------------
 
 ## 2 Way ANOVA
@@ -23,8 +24,8 @@ interaction.plot(x.factor = data$exercise, trace.factor = data$sex,
 
 # Describe the data
 describeBy(data$sbp,list(data$exercise,data$sex),mat=TRUE) # Method 1
-
-group_by(data, exercise, sex) %>% # Method 2
+#method 2 
+group_by(data, exercise, sex) %>%
   summary(
     count = n(),
     mean = mean(sbp, na.rm = TRUE),

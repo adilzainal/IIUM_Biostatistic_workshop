@@ -8,7 +8,7 @@ library(tidyverse)
 ## Repeated measure ANOVA
 # The repeated measure ANOVA is used to analyze when we measure more than once.
 # One way repeated measure ANOVA is essentially an extension of paired sample t-test to compare means of 3 or more level of within subject variable
-# A 2 way ANOVA is to evaluate simultaneously effect of 2 within subject factors on a continous outcome
+# A 2 way ANOVA is to evaluate simultaneously effect of 2 between and within subject factors on a continous outcome
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
