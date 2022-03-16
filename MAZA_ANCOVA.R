@@ -1,7 +1,9 @@
 # Package required
 library(ggpubr)
 library(emmeans)
-
+library(rstatix)
+require(devtools)
+install_version("emmeans",version="1.5.2-1",repos="http://cran.us.r-project.org")
 #-----------------------------------------------------------------------------------------------------------------------------
 
 ## ANCOVA 
@@ -9,10 +11,9 @@ library(emmeans)
 # One-way ANCOVA is just an extension of one-way ANOVA but adding a covariate
 # Let say we want to know whether is there significant different of systolic blood pressure between exercise level taking into account HbA1c level
 # The different between ANCOVA and regression is that regression is more advanced analysis when you want to do prediction
-# Whereas ancova is when the focus is to compare the on of the independent variable groups
+# Whereas ancova is when the focus is to compare the effect of categorical iv on  the dependent variable groups
 
 #-----------------------------------------------------------------------------------------------------------------------------
-
 # Run ANCOVA main effect
 res.aov <- data %>%
   anova_test(sbp ~ hba1c + exercise)
@@ -79,9 +80,10 @@ model.metrics %>%
   as.data.frame()
 
 #-----------------------------------------------------------------------------------------------------------------------------
-
+wanova5 <- aov(sbp ~ exercise + hba1c, data = data)
+summary(wanova5)
 # Reporting the result
-apa.aov.table(res.aov, filename = "Table5_APA.doc", table.number = 5)
+apa.aov.table(wanova5, filename = "Table5_APA.doc", table.number = 5)
 
 
 

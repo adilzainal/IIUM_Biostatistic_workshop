@@ -5,6 +5,7 @@ install.packages("ggplot")
 install.packages("rstan")
 install.packages("boot")
 install.packages("stargazer")
+install.packages("effects")
 library(aod)
 library(dplyr)
 library(ggplot)
@@ -15,6 +16,7 @@ library(rstan)
 library(boot)
 library(knitr)
 library(stargazer)
+library(effects)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 

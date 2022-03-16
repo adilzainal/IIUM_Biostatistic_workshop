@@ -2,6 +2,7 @@
 library(psych)
 library(car)
 library(dplyr)
+library(magrittr)
 #-------------------------------------------------------------------------------------------------------------------
 
 ## 2 Way ANOVA
@@ -19,17 +20,12 @@ data$exercise <- factor(data$exercise,levels = c("Low", "Moderate", "High"))
 interaction.plot(x.factor = data$exercise, trace.factor = data$sex, 
                  response = data$sbp, fun = mean, 
                  type = "b", legend = TRUE, 
-                 xlab = "Exercise", ylab="SBP",
-                 pch=c(1,19), col = c("#00AFBB", "#E7B800")) 
+                 xlab = "Exercise", ylab="SBP(mmHg)",
+                 pch=c(2,19), col = c("#00AFBB", "#E7B800")) 
 
 # Describe the data
 describeBy(data$sbp,list(data$exercise,data$sex),mat=TRUE) # Method 1
-#method 2 
-group_by(data, exercise, sex) %>%
-  summary(
-    count = n(),
-    mean = mean(sbp, na.rm = TRUE),
-    sd = sd(sbp, na.rm = TRUE))
+
 #-------------------------------------------------------------------------------------------------------------------
 
 # We can then run the 2 way anova by using aov command and see the summary of the variance model using summary command
@@ -46,7 +42,7 @@ summary(wanova2, type=3)
 # It can be seen that the interaction hypothesis is not significant, thus the relationship of exercise and sbp does not depend on sex
 
 # Since the main effect of exercise is significant we need to do post hoc test to see which pair is significant
-TukeyHSD(wanova2, which = "exercise")
+TukeyHSD(wanova, which = "exercise")
 
 # There is significant different of sbp between high with moderate and low after control for sex
 # If significant interaction, the relatioship between exercise and sbp depends on gender
@@ -73,6 +69,7 @@ Anova(wanova3, type=3)
 #-------------------------------------------------------------------------------------------------------------------
 
 # Report writing using APA Table
+library(apaTables)
 apa.aov.table(wanova2, filename = "Table3_APA_2Wayanova.doc", table.number = 3)
 
 

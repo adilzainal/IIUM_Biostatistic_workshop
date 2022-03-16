@@ -24,9 +24,9 @@ data %>%
 #-----------------------------------------------------------------------------------------------------------------------------
 
 # Compute manova , we use pillai trace as the multivariate statistic as it is recommended. There are 3 other test.
-model <- lm(cbind(sbp, dbp) ~ exercise, data)
-Manova(model, test.statistic = "Pillai")
-summary.aov(model)
+res.man <- manova(cbind(sbp, dbp) ~ exercise, data = data)
+summary(res.man)
+summary.aov(res.man)
 # There was statistically significant difference between the exercise on the linear combination of sbp and dbp
 # Seperate anova also show significant different between exercise on sbp and dbp respectively
 
@@ -85,7 +85,7 @@ results$plots
 data %>% 
   gather(key = "variable", value = "value", sbp, dbp) %>%
   group_by(variable) %>%
-  levene_test(value ~ exercise)
+  levene_test(value ~ exercise) 
 
 # 8. Homogeneity of variance-covariance matrices using Box's M Test, 
 box_m(data[, c("sbp", "dbp")], data$exercise)

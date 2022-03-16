@@ -82,10 +82,9 @@ data1 %>%
   get_summary_stats(sbpmeasure, type = "mean_sd")
 
 # visualize 
-bxp <- ggboxplot(
-  data1, x = "time", y = "sbpmeasure",
-  color = "exercise", palette = "jco"
-)
+bxp <- ggboxplot(data1, x = "time", 
+                 y = "sbpmeasure",
+  color = "exercise", palette = "jco")
 bxp
 
 #assumption
@@ -106,7 +105,7 @@ twrmanova
 
 # There is significant different of sbp between time, p <0.01
 # There is significant different of sbp between exercise, p<0.01
-# There is a statistically significant two-way interactions between exercise and time, p < 0.01.
+# There is no statistically significant two-way interactions between exercise and time, p > 0.05.
 
 interaction.plot(data1$time, factor(data1$exercise),
                  data1$sbpmeasure, fun = mean, type="b", pch = c(2,4,6),
