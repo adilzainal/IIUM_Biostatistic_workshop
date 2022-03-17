@@ -80,6 +80,12 @@ probabilities <- predict(mlogmodel, type = "response")
 predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
 head(predicted.classes)
 
+#Interaction term
+mlogmodel3 <- glm(hpt ~ exercise + hba1c + exercise*hba1c, data=data, family=binomial)
+summary(mlogmodel3)
+wald.test(b = coef(mlogmodel3), Sigma = vcov(mlogmodel), Terms = 5:6)
+exp(coef(mlogmodel3))
+exp(confint(mlogmodel3))
 #-----------------------------------------------------------------------------------------------------------------------------
 
 # Logistic regression assumptions
