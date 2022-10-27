@@ -60,6 +60,21 @@ with(logmodel, null.deviance - deviance) # To get the test statistic
 with(logmodel, df.null - df.residual) # To get the degree of freedom
 with(logmodel, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE)) # To get the p value
 # Our model is as a whole fits significantly better than an empty model
+summary(logmodel) # look for AIC for model fit, smaller AIC is better
+
+dataA<-data[age<45,]
+dataB<-data[age>=45,]
+logmodelA <- glm(hpt ~ exercise, data=dataA, family=binomial)
+#Predicting using logistic model
+glm.probs = predict(logmodelA, newdata = dataB, type = "response")
+dataB$pred_glm = ifelse(glm.probs > 0.5, "FALSE", "TRUE")
+dataB$pred_glm = as.factor(dataB$pred_glm)
+#Checking the accuracy of the logistic model
+confusionMatrix(dataB$hpt,dataB$pred_glm)
+# As you can see, we are able to obtain about 39.66% accuracy overall, 
+# which isn’t very good.
+# However, we have 36.36% prediction accuracy on ‘TRUE’ which is hypertensive
+# Perhaps this means we can't trade with confidence when our model predicts hypertensive in the future. 
 
 #-----------------------------------------------------------------------------------------------------------------------------
 
