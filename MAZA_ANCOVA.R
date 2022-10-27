@@ -16,7 +16,7 @@ install_version("emmeans",version="1.5.2-1",repos="http://cran.us.r-project.org"
 #-----------------------------------------------------------------------------------------------------------------------------
 # Run ANCOVA main effect
 res.aov <- data %>%
-  anova_test(sbp ~ hba1c + exercise)
+  anova_test(sbp ~ exercise + hba1c)
 get_anova_table(res.aov)
 
 # Run post hoc test pairwise comparisons

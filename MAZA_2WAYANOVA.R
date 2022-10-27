@@ -2,7 +2,6 @@
 library(psych)
 library(car)
 library(dplyr)
-library(magrittr)
 #-------------------------------------------------------------------------------------------------------------------
 
 ## 2 Way ANOVA
@@ -25,7 +24,12 @@ interaction.plot(x.factor = data$exercise, trace.factor = data$sex,
 
 # Describe the data
 describeBy(data$sbp,list(data$exercise,data$sex),mat=TRUE) # Method 1
-
+#method 2 
+group_by(data, exercise, sex) %>%
+  summary(
+    count = n(),
+    mean = mean(sbp, na.rm = TRUE),
+    sd = sd(sbp, na.rm = TRUE))
 #-------------------------------------------------------------------------------------------------------------------
 
 # We can then run the 2 way anova by using aov command and see the summary of the variance model using summary command

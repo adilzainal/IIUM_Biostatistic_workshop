@@ -42,7 +42,6 @@ pwc <- data %>%
 pwc
 
 # We can conclude that there is significant different between low and high for dbp and between low and moderate with high for sbp
-
 #-----------------------------------------------------------------------------------------------------------------------------
 
 # Assumptions for MANOVA are
