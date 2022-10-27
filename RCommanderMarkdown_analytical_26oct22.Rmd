@@ -1,0 +1,393 @@
+Analytical Statistics
+======================
+
+###Edre MA, DrPH
+
+###`r as.character(Sys.Date())`
+
+#objective 3: To determine the factors contributing to hypertension<br>
+#we want to know first what contributes to systolic hypertension
+
+----------------------------------------<br>
+#Comparing numerical values: parametric
+----------------------------------------
+
+#we use same modified "hstat" dataset as in descriptive statistics session<br)
+#inspect first our dataset, ensure all numerical as numeric, categorical as factors<br>
+#active dataset->variables->show variables in active dataset
+
+```{r}
+#####Show variables in active data set#####
+```
+
+### str
+```{r}
+str(hstat)
+```
+
+#reorder our exercise variables first
+
+
+```{r}
+#####Reorder Factor Levels#####
+hstat$exercise <- factor(hstat$exercise, levels=c('Low','Moderate','High'), ordered=TRUE)
+```
+
+#if our IV is categorical with 2 categories<br>
+#example, we want to know if being male has any relationship with sbp<br>
+#stat analysis->continuous variable->two sample t test<br>
+#we want to visualize the comparison too
+
+### independent sample t test
+
+```{r}
+#####Two-sample t-test#####
+group.names <- NULL
+group.means <- NULL
+group.sds <- NULL
+group.p <- NULL
+res <- NULL
+(res <- t.test(sbp~factor(sex), alternative='two.sided', conf.level=0.95, var.equal=TRUE, data=hstat))
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+bar.means <- tapply(hstat$sbp, factor(hstat$sex), mean, na.rm=TRUE)
+bar.sds <- tapply(hstat$sbp, factor(hstat$sex), sd, na.rm=TRUE)
+bar.sds <- ifelse(is.na(bar.sds), 0, bar.sds)
+barx <- barplot(bar.means, ylim=c(ifelse(min(bar.means, na.rm=TRUE)>0, 0, min(bar.means-bar.sds, na.rm=TRUE)*1.2), max(bar.means+bar.sds, na.rm=TRUE)*1.2), 
+  xlab="sex", ylab="sbp", axis.lty=1)
+error.bar(barx, bar.means, bar.sds)
+group.names <- c(group.names, "sex=Female")
+group.means <- c(group.means, bar.means[1])
+group.sds <- c(group.sds, bar.sds[1])
+group.p <- c(group.p, signif(res$p.value,digits=3))
+group.names <- c(group.names, "sex=Male")
+group.means <- c(group.means, bar.means[2])
+group.sds <- c(group.sds, bar.sds[2])
+group.p <- c(group.p, "")
+summary.ttest <- NULL
+summary.ttest <- data.frame(mean=group.means, sd=group.sds, p.value=group.p)
+rownames(summary.ttest) <- group.names
+colnames(summary.ttest) <- gettext(domain="R-RcmdrPlugin.EZR",colnames(summary.ttest))
+summary.ttest
+```
+
+#now we know sex has no effect on sbp in our study<br>
+#we want to know now, does exercise have an effect (low,mod,high intensity)<br>
+#one way ANOVA (assume equal variance, if not use welch ANOVA)<br>
+#stat analysis->continuous variable->one-way ANOVA
+
+```{r}
+library(mvtnorm, pos=23)
+```
+
+
+```{r}
+library(survival, pos=23)
+```
+
+
+```{r}
+library(MASS, pos=23)
+```
+
+
+```{r}
+library(TH.data, pos=23)
+```
+
+
+```{r}
+library(multcomp, pos=23)
+```
+
+
+
+### One-Way Analysis of Variance: sbp ~ factor(exercise)
+
+### pairwise.t.test
+```{r}
+#####One-way ANOVA#####
+group.names <- NULL
+group.means <- NULL
+group.sds <- NULL
+group.p <- NULL
+AnovaModel.1 <- aov(sbp ~ factor(exercise), data=hstat, na.action=na.omit)
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+bar.means <- tapply(hstat$sbp, factor(hstat$exercise), mean, na.rm=TRUE)
+bar.sds <- tapply(hstat$sbp, factor(hstat$exercise), sd, na.rm=TRUE)
+error.bar <- function(x, y, upper, lower=upper, length=0.1,...){
+if(length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper))
+	stop("vectors must be same length")
+	arrows(x,y+upper, x, y-lower, angle=90, code=3, length=length, ...)
+}
+barx <- barplot(bar.means, ylim=c(ifelse(min(bar.means, na.rm=TRUE)>0, 0, min(bar.means-bar.sds, na.rm=TRUE)*1.2), max(bar.means+bar.sds, na.rm=TRUE)*1.2), 
+  xlab="exercise", ylab="sbp", axis.lty=1)
+error.bar(barx, bar.means, bar.sds)
+group.names <- c(group.names, "exercise=Low")
+group.means <- c(group.means, bar.means[1])
+group.sds <- c(group.sds, bar.sds[1])
+res <- NULL
+res <- summary(lm(sbp ~ factor(exercise), data=hstat))
+group.p <- c(group.p, signif(pf(res$fstatistic[1], res$fstatistic[2], res$fstatistic[3], lower.tail=FALSE), digits=3))
+group.names <- c(group.names, "exercise=Moderate")
+group.means <- c(group.means, bar.means[2])
+group.sds <- c(group.sds, bar.sds[2])
+group.p <- c(group.p, "")
+group.names <- c(group.names, "exercise=High")
+group.means <- c(group.means, bar.means[3])
+group.sds <- c(group.sds, bar.sds[3])
+group.p <- c(group.p, "")
+summary(AnovaModel.1)
+summary.anova <- NULL
+summary.anova <- data.frame(mean=group.means, sd=group.sds, p.value=group.p)
+rownames(summary.anova) <- group.names
+colnames(summary.anova) <- gettext(domain="R-RcmdrPlugin.EZR",colnames(summary.anova))
+summary.anova
+pairwise.t.test(hstat$sbp, hstat$exercise, var.equal=TRUE, p.adj="bonferroni")
+```
+
+#Exercise adds benefit in sbp reduction<br>
+#does sbp correlate with weight?
+#stat analysis->continuous variable->test for Pearsons correlation
+
+### pearson correlation with Scatterplot: sbp~wt
+
+```{r}
+#####Test for Pearson's correlation#####
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+scatterplot(sbp~wt, regLine=list(method=lm, lty=1), smooth=FALSE, boxplots='xy', data=hstat)
+res <- NULL
+(res <- cor.test(hstat$sbp, hstat$wt, alternative="two.sided", method="pearson"))
+cat(gettext(domain="R-RcmdrPlugin.EZR", "correlation coefficient"), " = ", signif(res$estimate, digits=3), ", ", gettext(domain="R-RcmdrPlugin.EZR", "95% CI"), 
+  " ", signif(res$conf.int[1],digits=3), "-", signif(res$conf.int[2],digits=3), ", ", gettext(domain="R-RcmdrPlugin.EZR", "p.value"), " = ", signif(res$p.value, 
+  digits=3), "
+", sep="")
+```
+
+#yes, the heavier the person, the higher the sbp<br>
+#now you conducted a high-intensity interval training (HIIT) intervention<br>
+#you want to measure pre and post HIIT effect on weight<br>
+#stat analysis->continuous->paired t test
+
+### paired t test 
+
+```{r}
+#####Paired t-test#####
+(res <- t.test(hstat$wt, hstat$wt2, alternative='two.sided', conf.level=0.95, paired=TRUE))
+mean1 <- mean(hstat$wt, na.rm=TRUE)
+mean2 <- mean(hstat$wt2, na.rm=TRUE)
+sd1 <- sd(hstat$wt, na.rm=TRUE)
+sd2 <- sd(hstat$wt2, na.rm=TRUE)
+summary.ttest <- NULL
+summary.ttest <- data.frame(mean=c(mean1, mean2), sd=c(sd1, sd2), p.value=c(signif(res$p.value, digit=3),""))
+rownames(summary.ttest) <- c("wt", "wt2")
+colnames(summary.ttest) <- gettext(domain="R-RcmdrPlugin.EZR",colnames(summary.ttest))
+summary.ttest
+```
+
+#Now we know that sbp is affected by weight.<br>
+#exercise gives additional benefit to weight reduction<br>
+#you are now concerned with the exercise giving effect on cardiovascular health<br>
+#homocysteine (hcy) relates to cardiovascular heath from literature<br>
+#what are the factors contributing to hcy level?
+
+------------------------------------------<br>
+#Comparing numerical values: non-parametric
+------------------------------------------
+
+#try transforming data into normal distribution by ln<br>
+#active dataset->variables->logarithmic transformation<br>
+#then check again for normality
+
+### log
+```{r}
+#####Logarithmic transformation#####
+hstat$hcyln <- log(hstat$hcy, base=exp(1))
+#New variable hcyln was made.
+```
+
+```{r}
+#####Kolmogorov-smirnov test for normal distribution#####
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+hist2(hstat$hcyln, freq=F, main="", xlab="hcyln", ylab="", col="darkgray")
+curve(dnorm(x, mean=mean(hstat$hcyln[!is.na(hstat$hcyln)]), sd=sd(hstat$hcyln[!is.na(hstat$hcyln)])), add=T)
+skewness.kurtosis(hstat$hcyln)
+ks.test(hstat$hcyln, "pnorm", mean=mean(hstat$hcyln[!is.na(hstat$hcyln)]), sd=sd(hstat$hcyln[!is.na(hstat$hcyln)]))
+# Shapiro-Wilk test can be performed only when the sample size is less than 5000. (Sample size = 153)
+shapiro.test(hstat$hcyln)
+```
+
+#still not normally distributed<br>
+#need to do non-parametric test
+
+#female has higher or lower hcy level compared to male?<br>
+
+### mann whitney U test
+
+#stat analysis->nonparametric->mann whitney U test<br>
+
+```{r}
+#####Mann-Whitney U test#####
+group.names <- NULL
+group.median <- NULL
+group.min <- NULL
+group.max <- NULL
+group.1Q <- NULL
+group.3Q <- NULL
+group.p <- NULL
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+boxplot(hcy~ factor(sex), ylab="hcy", xlab="sex", data=hstat)
+(res <- wilcox.test(hcy ~ factor(sex), alternative="two.sided", data=hstat))
+group.names <- c(group.names, "sex=Female")
+group.min <- c(group.min, with(hstat, min(hcy[sex=='Female'], na.rm=TRUE)))
+group.1Q <- c(group.1Q, with(hstat, quantile(hcy[sex=='Female'], 0.25, na.rm=TRUE)))
+group.median <- c(group.median, with(hstat, median(hcy[sex=='Female'], na.rm=TRUE)))
+group.3Q <- c(group.3Q, with(hstat, quantile(hcy[sex=='Female'], 0.75, na.rm=TRUE)))
+group.max <- c(group.max, with(hstat, max(hcy[sex=='Female'], na.rm=TRUE)))
+group.p <- c(group.p, signif(res$p.value,digits=3))
+group.names <- c(group.names, "sex=Male")
+group.min <- c(group.min, with(hstat, min(hcy[sex=='Male'], na.rm=TRUE)))
+group.1Q <- c(group.1Q, with(hstat, quantile(hcy[sex=='Male'], 0.25, na.rm=TRUE)))
+group.median <- c(group.median, with(hstat, median(hcy[sex=='Male'], na.rm=TRUE)))
+group.3Q <- c(group.3Q, with(hstat, quantile(hcy[sex=='Male'], 0.75, na.rm=TRUE)))
+group.max <- c(group.max, with(hstat, max(hcy[sex=='Male'], na.rm=TRUE)))
+group.p <- c(group.p, "")
+mannwhitney.table <- NULL
+mannwhitney.table <- data.frame(Minimum=group.min, Q1=group.1Q, Median=group.median, Q3=group.3Q, Maximum=group.max, p.value=group.p)
+rownames(mannwhitney.table) <- group.names
+colnames(mannwhitney.table)[c(2,4)] <- c("25%", "75%")
+colnames(mannwhitney.table) <- gettext(domain="R-RcmdrPlugin.EZR",colnames(mannwhitney.table))
+mannwhitney.table
+```
+
+#sex has no signififant relationship with hcy<br>
+#how about exercise intensity?
+
+### kruskal wallis test
+
+```{r}
+#####Kruskal-Wallis test#####
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+boxplot(hcy~ factor(exercise), ylab="hcy", xlab="exercise", data=hstat)
+tapply(hstat$hcy, hstat$exercise, median, na.rm=TRUE)
+res <- NULL
+(res <- kruskal.test(hcy ~ factor(exercise), data=hstat))
+cat(gettext(domain="R-RcmdrPlugin.EZR", "Kruskal-Wallis test"), " ", gettext(domain="R-RcmdrPlugin.EZR", "p.value"), " = ", signif(res$p.value, digits=3), "
+", sep="")
+pairwise.kruskal.test(hstat$hcy, hstat$exercise, data.name="hstat", p.adjust.method="bonferroni")
+```
+
+#high intensity exercise significantly gives lower HCY compared to low/mod<br>
+#you proceed in continuing the HIIT intervention as it gives benefit to both sbp and hcy<br>
+#measure effectiveness again on weight reduction (wt2-wt3, assume non-normal wt3 data)
+
+### wilcoxon signed rank test
+
+```{r}
+#####Wilcoxon's signed rank test#####
+median(hstat$wt2 - hstat$wt3, na.rm=TRUE) # median difference
+res <- NULL
+(res <- wilcox.test(hstat$wt2, hstat$wt3, alternative='two.sided', paired=TRUE))
+cat(gettext(domain="R-RcmdrPlugin.EZR", "Wilcoxon's signed rank test"), "p.value = 7.38e-27
+")
+```
+
+#yes, the HIIT is effective in weight reduction<br>
+#however you noticed some of your respondents are diabetic, risk of CVD is there<br>
+#worry that your intervention gives more harm than good<br>
+#finding relationship between hba1c and hcy<br>
+
+### spearman correlation coefficient test
+
+```{r}
+#####Spearman's rank correlation test#####
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+scatterplot(hba1c~hcy, regLine=list(method=lm, lty=1), smooth=FALSE, boxplots='xy', data=hstat)
+res <- NULL
+(res <- cor.test(hstat$hba1c, hstat$hcy, alternative="two.sided", method="spearman"))
+cat(gettext(domain="R-RcmdrPlugin.EZR", "Spearman's rank correlation coefficient"), signif(res$estimate, digits=3), gettext(domain="R-RcmdrPlugin.EZR", 
+  "p.value"), " = ", signif(res$p.value, digits=3), "
+")
+```
+
+#you conclude that hcy has no significant correlation with hba1c<br>
+#in future, you would prioritize giving HITT intervention to the diabetic & hypertensive patients
+
+#now, you are focused back to your objective 3<br>
+#factors contributing to hypertension (hpt)
+
+----------------------------<br>
+#Comparing categorical variables
+----------------------------
+
+#assuming you are using same dataset with the transformed varibles(refer descriptive stat notes)<br>
+#smoking has a relationship with hpt?<br>
+#stat analysis -> discrete -> create two way table (tick "print expected frequencies" and "chi square test",untick "fisher exact")
+
+### Chi square test
+
+```{r}
+#####Create two-way table and compare two proportions (Fisher's exact test)#####
+Fisher.summary.table <- NULL
+.Table <- NULL
+.Table <- xtabs(~smoking+hpt, data=hstat)
+.Table
+rowPercents(.Table) # Row Percentages
+.Test <- chisq.test(.Table, correct=TRUE)
+.Test
+.Test$expected # Expected Counts
+remove(.Test)
+res <- NULL
+res <- chisq.test(.Table, correct=TRUE)
+Fisher.summary.table <- rbind(Fisher.summary.table, summary.table.twoway(table=.Table, res=res))
+colnames(Fisher.summary.table)[length(Fisher.summary.table)] <-  gettext(domain="R-RcmdrPlugin.EZR", 
+  colnames(Fisher.summary.table)[length(Fisher.summary.table)])
+Fisher.summary.table
+```
+
+#yes, smoking is significantly related to hpt. More smokers are hypertensive
+
+#how about BMI status and hpt?
+
+### Fisher's exact test
+
+#do the same method as chi square, except now tick "fisher exact" box<br>
+#used when more than 20% cells with expected count less than 5
+
+```{r}
+#####Create two-way table and compare two proportions (Fisher's exact test)#####
+Fisher.summary.table <- NULL
+.Table <- NULL
+.Table <- xtabs(~bmistatus+hpt, data=hstat)
+.Table
+rowPercents(.Table) # Row Percentages
+.Test <- chisq.test(.Table, correct=TRUE)
+.Test
+.Test$expected # Expected Counts
+remove(.Test)
+fisher.test(.Table)
+res <- NULL
+res <- fisher.test(.Table)
+Fisher.summary.table <- rbind(Fisher.summary.table, summary.table.twoway(table=.Table, res=res))
+colnames(Fisher.summary.table)[length(Fisher.summary.table)] <-  gettext(domain="R-RcmdrPlugin.EZR", 
+  colnames(Fisher.summary.table)[length(Fisher.summary.table)])
+Fisher.summary.table
+```
+
+#significant relationship between hpt and bmi status
+
+---------------------------------------<br>
+#Reporting your findings in table form
+---------------------------------------
+
+#example is the fisher exact test result for bmistatus-hpt just now<br>
+#graphs and tables -> summary table of results -> two-way table+CSV as output
+
+### table 1: association between BMI status and HPT
+
+```{r}
+#####Summary table of results#####
+if(objectCheck("Fisher.summary.table", objects())) w.twoway(Fisher.summary.table, 
+  filename="C:/Users/raef/Desktop/rcommander wshop/old files/IIUM_Biostatistic_workshop-main/Fisher.summary.table.csv", en=1)
+```
+
+#THANK YOU

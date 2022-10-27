@@ -1,0 +1,322 @@
+Descriptive Statistics
+======================
+
+###Edre MA, DrPH
+
+###`r as.character(Sys.Date())`
+
+#we will be using R commander to ease the learning<br>
+#now lets start by looking at a scenario<br>
+#You are a researcher involved in a hypertension study<br>
+#objective 1: To describe the background characteristics of respondents<br>
+#objective 2: To determine the prevalence of hypertension<br>
+#objective 3: To determine the factors contributing to hypertension
+
+#----------------------------------<br>
+#Packages,library & setup<br>
+#----------------------------------
+
+#packages include "Rcdmr" AND "RcmdrPlugin.EZR"<br>
+#first, install both packages <br>
+install.packages("Rcmdr", repos='http://cran.us.r-project.org')<br>
+install.packages("RcmdrPlugin.EZR", repos='http://cran.us.r-project.org')<br>
+#load the package -> start the GUI version of R !<br>
+library(Rcmdr)<br>
+#go ahead, open R commander window and explore it<br>
+#it looks pretty much like spss, suitable for beginners. and its free!<br>
+#bit more setup<br>
+#go to tool->option->output->adjust window height line to "10" AND untick "send output to R console"<br>
+#restart R commander<br>
+#then go back to tools -> load Rcmdr plugins -> load the "RcmdrPlugin.EZR" ->restart again r commander<br>
+#save your settings (workspace). Save often
+
+#--------------<br>
+#data<br>
+#--------------
+
+#pulling the data from GitHub
+
+#go to https://github.com/adilzainal/IIUM_Biostatistic_workshop<br>
+#click "code" -> "Download ZIP"<br>
+#extract the ZIP file using WinRAR<br>
+#Create a new specific folder to store all files in your desktop<br>
+#set as working directory in r commander<br>
+#go to file -> change working directory
+
+```{r}
+setwd("C:/Users/raef/Desktop/rcommander wshop")
+```
+
+#loading the data
+
+#if excel spreadsheet file (.xlsx)<br>
+#file->import data-> from excel dataset ->rename as "hstat"->ok<br>
+```{r}
+hstat <- readXL("C:/Users/raef/Desktop/rcommander wshop/healthstatus6.xlsx", rownames=FALSE, header=TRUE, na="", sheet="healthstatus6", stringsAsFactors=TRUE)
+```
+
+#view data set<br>
+#edit data set<br>
+
+#----------------------------<br>
+#objective 1: To describe the background characteristics of respondents<br>
+#summarising numerical values<br>
+#----------------------------
+
+#we choose 3 IVs: age,sbp,dbp<br>
+#statistical analysis->continuous variables->numerical summaries
+
+### numSummary2
+```{r}
+#####Numerical summaries#####
+res <- numSummary2(hstat[,c("age", "dbp", "sbp")], statistics=c("mean", "u.sd", "quantiles"), quantiles=c(0,.25,.5,.75,1))
+colnames(res$table) <- gettext(domain="R-RcmdrPlugin.EZR", colnames(res$table))
+res
+```
+
+#--------------------------<br>
+#normality assumption check<br>
+#--------------------------<br>
+#there are 5 criteria before you make decision what to report:
+
+#1.mean~median<br>
+#select only "mean" and ".5" quantile
+
+### numSummary2
+```{r}
+#####Numerical summaries#####
+res <- numSummary2(hstat[,c("age", "dbp", "sbp")], statistics=c("mean", "quantiles"), quantiles=c(.5))
+colnames(res$table) <- gettext(domain="R-RcmdrPlugin.EZR", colnames(res$table))
+res
+```
+
+#2. qqplot<br>
+#go to graph and tables->quantile-comparison plot
+
+### Residual Quantile-Comparison Plot: hstat: age
+```{r}
+#####Quantile-comparison plot#####
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+qqPlot(hstat$age, dist="norm")
+```
+
+#3-5. bell shaped curve, skewness/kurtosis & normality test<br>
+#statistical analysis->continuous variables->KS test for normal distribution<br>
+#shapiro wilk for <5000, KS test for 5000 or more samples
+
+### hist2
+
+### curve
+
+### skewness.kurtosis
+
+### ks.test
+
+### shapiro.test
+```{r}
+#####Kolmogorov-smirnov test for normal distribution#####
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+hist2(hstat$age, freq=F, main="", xlab="age", ylab="", col="darkgray")
+curve(dnorm(x, mean=mean(hstat$age[!is.na(hstat$age)]), sd=sd(hstat$age[!is.na(hstat$age)])), add=T)
+skewness.kurtosis(hstat$age)
+ks.test(hstat$age, "pnorm", mean=mean(hstat$age[!is.na(hstat$age)]), sd=sd(hstat$age[!is.na(hstat$age)]))
+# Shapiro-Wilk test can be performed only when the sample size is less than 5000. (Sample size = 153)
+shapiro.test(hstat$age)
+```
+
+#finally, make your decision
+
+
+### numSummary2
+```{r}
+#####Numerical summaries#####
+res <- numSummary2(hstat[,c("age", "dbp", "sbp")], statistics=c("mean", "u.sd"), quantiles=c(0,.25,.5,.75,1))
+colnames(res$table) <- gettext(domain="R-RcmdrPlugin.EZR", colnames(res$table))
+res
+```
+
+#------------------------------<br>
+#summarising categorical values<br>
+#------------------------------
+
+#go to statistical analysis->discrete variables->frequency distribution->tick show missing data
+
+### Frequencies: exercise, sex, smoking
+
+```{r}
+#####Frequency Distributions#####
+.Table <- NULL
+(.Table <- table(hstat$exercise, exclude=NULL))  # counts for exercise
+round(100*.Table/sum(.Table), 2)  # percentages for   exercise
+.Table <- NULL
+(.Table <- table(hstat$sex, exclude=NULL))  # counts for sex
+round(100*.Table/sum(.Table), 2)  # percentages for   sex
+.Table <- NULL
+(.Table <- table(hstat$smoking, exclude=NULL))  # counts for smoking
+round(100*.Table/sum(.Table), 2)  # percentages for   smoking
+```
+
+#count refers to the frequency of the category
+
+#-------------<br>
+#missing data<br>
+#-------------
+
+#usually coded as "NA" in the dataset<br>
+#we create a dummy dataset "hstat2" first to showcase this exercise<br>
+#file->import data->from excel file->rename to hstat2<br>
+#click "edit data set" and delete "smoking" and "ht" entry for id5<br>\
+#active data set-> missing observation-> count missing observation of all variables
+
+### Count Missing Cases: hstat2
+```{r}
+sapply(hstat2, function(x)(sum(is.na(x)))) # NA counts
+```
+
+#-----------------<br>
+#outlier detection<br>
+#-----------------
+
+#create an outlier dummy data <br>
+#change id2 age to 499 for "hstat2" data and save
+#check with statistical analysis ->continuous variables-> smirnov-grubbs test for outliers
+
+### RemoveOutlier
+```{r}
+#####Smirnov-Grubbs test for outliers#####
+RemoveOutlier(hstat2$age, return=0)
+```
+
+#visual method by boxplot
+
+
+### bxp
+```{r}
+#####Boxplot#####
+windows(width=7, height=7); par(lwd=1, las=1, family="sans", cex=1, mgp=c(3.0,1,0))
+boxdata <- boxplot(hstat2$age[complete.cases(hstat2$age)], ylab="age", plot=FALSE)
+boxdata$stats[1,] <- quantile(hstat2$age[complete.cases(hstat2$age)], .1, na.rm=TRUE)
+boxdata$stats[5,] <- quantile(hstat2$age[complete.cases(hstat2$age)], .9, na.rm=TRUE)
+boxdata.outliers <- hstat2$age[complete.cases(hstat2$age)][hstat2$age[complete.cases(hstat2$age)]<boxdata$stats[1,] | 
+  hstat2$age[complete.cases(hstat2$age)]>boxdata$stats[5,]]
+boxdata$out <- c(boxdata$out, boxdata.outliers)
+boxdata$group <- c(boxdata$group, rep(1, length(boxdata.outliers)))
+bxp(boxdata, ylab="age")
+remove(boxdata)
+remove(boxdata.outliers)
+```
+
+
+#--------------------------------------<br>
+#objective 2: To determine the prevalence of hypertension<br>
+#objective 3: To determine the factors contributing to hypertension<br>
+#basic data transformation:categorizing<br>
+#--------------------------------------
+
+
+#hypertension status (either sbp or dbp equal or more than 140/90mmHg, respectively, considered hypertensive)<br>
+#to answer objective 2, change back dataset to "hstat"<br>
+#active dataset->variables->create new variable
+
+```{r}
+#####Create new variable#####
+hstat$hpt <- with(hstat, ifelse(sbp<140 & dbp<90, 'normal','high'))
+#New variable hpt was made.
+```
+
+#View or edit data set, we have the new variable "hpt" !<br>
+#make it as a factor first (active dataset->variables->convert all character variables to factor)
+
+### ChrToFactor
+```{r}
+#####Convert all character variables to factors#####
+hstat <- ChrToFactor(hstat)
+```
+
+#prevalence : statistical analysis->discrete variables->frequency distributions
+
+```{r}
+#####Frequency Distributions#####
+.Table <- NULL
+(.Table <- table(hstat$hpt, exclude=NULL))  # counts for hpt
+round(100*.Table/sum(.Table), 2)  # percentages for   hpt
+```
+
+#to make data preparation for objective 3<br>
+#glucose control (6.5% and above considered poor)<br>
+#active dataset->variables->recode variable
+
+```{r}
+#####Recode variables#####
+hstat <- within(hstat, {
+  glucontrol <- Recode(hba1c, '0.01:6.49="good"; 6.50:50.0="poor";', as.factor=TRUE)
+})
+```
+
+#view your data to double check<br>
+
+#bmistatus (WHO classification) : create new variable
+
+```{r}
+#####Create new variable#####
+hstat$bmi <- with(hstat, wt / ((ht/100)^2))
+#New variable bmi was made.
+```
+
+#double check again hstat before categorize<br>
+#we use bin numeric variables with more than 2 groups
+
+### cut
+```{r}
+#####Bin numeric variable to more than 2 groups with specified thresholds#####
+hstat$bmistatus <- cut(hstat$bmi, breaks=c(-Inf, 18.50, 25.00, 30.00, Inf), labels=c("underweight", "normal", "overweight", "obese"), right=FALSE)
+#New variable bmistatus was made.
+table(hstat$bmistatus, exclude=NULL)
+```
+
+#recheck again bmistatus
+
+#-------------------------------------------------<br>
+#Reporting your descriptive analysis<br>
+#-------------------------------------------------
+
+#graphs and tables->summary table of sample characteristics
+
+### finaltable_dataframe_print
+```{r}
+#####Summary table of sample characteristics#####
+CatTable <- CreateCatTable(vars = c("bmistatus", "exercise", "glucontrol", "hpt", "sex", "smoking"), data=hstat)
+matCatTable <- print(CatTable, printToggle = FALSE, showAllLevels = TRUE, exact=c("bmistatus", "exercise", "glucontrol", "hpt", "sex", "smoking"), smd = FALSE)
+matCatTable <- matCatTable[,colnames(matCatTable)!="test"]
+matCatTable <- cbind(Factor=row.names(matCatTable), matCatTable)
+ContTable <- CreateContTable(vars = c("age", "dbp", "sbp"), data=hstat)
+matContTable <- print(ContTable, printToggle = FALSE, explain = FALSE, smd = FALSE)
+matContTable <- matContTable[,colnames(matContTable)!="test"]
+matContTable <- cbind(level="", matContTable)
+matContTable <- cbind(Factor=row.names(matContTable), matContTable)
+ContnonnormalTable <- CreateContTable(vars = c("hcy"), data=hstat)
+matContnonnormalTable <- print(ContnonnormalTable, printToggle = FALSE, nonnormal = TRUE, explain = FALSE, minMax=FALSE, smd = FALSE)
+matContnonnormalTable <- matContnonnormalTable[,colnames(matContnonnormalTable)!="test"]
+matContnonnormalTable <- cbind(level="", matContnonnormalTable)
+matContnonnormalTable <- cbind(Factor=row.names(matContnonnormalTable), matContnonnormalTable)
+FinalTable <- as.matrix(matCatTable)
+tempStrata <- attributes(FinalTable)[[2]][2]
+FinalTable <- rbind(FinalTable, matContTable)
+FinalTable <- rbind(FinalTable, matContnonnormalTable)
+attributes(FinalTable) <- c(list(dim=attributes(FinalTable)[[1]]), list(dimnames=c(attributes(FinalTable)[[2]][1], tempStrata)))
+colnames(FinalTable)[2] <- "Group"
+row0 <- colnames(FinalTable)
+row1 <- FinalTable[1,]
+row1 <- matrix(row1, nrow=1)
+colnames(row1) <- row0
+FinalTable <- FinalTable[which(rownames(FinalTable)!="n"),]
+FinalTable <- rbind(n=row1, FinalTable)
+FinalTable <- rbind(row0, FinalTable)
+finaltable_dataframe_print(FinalTable)
+write.table(FinalTable, file="C:/Users/raef/Desktop/rcommander wshop/tableone_descriptive.csv", sep=",", row.names=FALSE, col.names=FALSE)
+```
+
+#thank you
+
+
+
