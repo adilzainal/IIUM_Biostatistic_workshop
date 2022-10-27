@@ -70,6 +70,14 @@ shapiro.test(x=aov_residuals)
 wanova3 <- aov(sbp ~ exercise + sex + exercise*sex, data = data)
 Anova(wanova3, type=3)
 
+# If the interaction is significant, present the result for different level of the effect modifier
+emwanova3 <- emmeans(wanova3, ~ exercise*sex)
+emwanova3
+
+# criteria for confounder - 1.assoc with outcome 2.assoc with disease and unequal distribution 3.not in pathway
+# confounder distort relationship so need to adjust the main effect
+# criteria for effect modifier - 1.assoc with outcome 2.not assoc with factor
+# effect of main variable differ according to different level of effect modifier
 #-------------------------------------------------------------------------------------------------------------------
 
 # Report writing using APA Table
